@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        VENV = "${WORKSPACE}/venv"
+        PATH = "${WORKSPACE}/venv/bin:${env.PATH}"
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -10,14 +15,17 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'python3 -m pip install --upgrade pip'
-                sh 'pip install -r requirements.txt'
+                sh '''
+                    python3 -m venv $VENV
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Python Script') {
             steps {
-                sh 'python3 main.py'
+                sh 'python main.py'
             }
         }
     }
